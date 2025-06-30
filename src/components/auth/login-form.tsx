@@ -1,21 +1,21 @@
 'use client'
 
-import React, { useState } from 'react'
+import { loginUser, requestOtp } from '@/store/slice/auth-slice'
+import { fetchBuses } from '@/store/slice/bus-slice'
+import { AppDispatch, RootState } from '@/store/store'
+import { yupResolver } from '@hookform/resolvers/yup'
 import {
-  TextField,
-  Button,
   Box,
+  Button,
+  TextField,
   Typography,
 } from '@mui/material'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/store/store'
-import { loginUser, requestOtp } from '@/store/slice/auth-slice'
 import { toast } from 'react-toastify'
-import { redirect } from 'next/navigation'
 import * as yup from "yup"
-import { yupResolver } from '@hookform/resolvers/yup';
 
 const schema = yup
     .object({
@@ -44,11 +44,19 @@ const LoginForm = () => {
 
   const onSubmit = async (data: LoginFormInputs) => {
     console.log("Login Data: ", data);
-    const result = await dispatch(loginUser(data))
+    const result = await dispatch(loginUser(data));
+    console.log("Login Result (user Data) : ",result.payload.user);
+    console.log("UserID: ",result.payload.user.userId);
+    dispatch(fetchBuses(result.payload.user.userId));
+    const role = result.payload.user.role
 
     if (loginUser.fulfilled.match(result)) {
       toast.success(result.payload.message || 'Logged in successfully');
-      redirect('/');
+      if(role == 'owner'){
+        redirect('/owner')
+      }else{
+        redirect('/passenger');
+      }
     } else {
       toast.error(result.payload as string)
     }
@@ -61,8 +69,7 @@ const LoginForm = () => {
       toast.error('Please enter your email to request OTP')
       return
     }
-
-    const result = await dispatch(requestOtp(email))
+    const result = await dispatch(requestOtp(email));
     if (requestOtp.fulfilled.match(result)) {
       toast.success('OTP sent to your email!')
     } else {

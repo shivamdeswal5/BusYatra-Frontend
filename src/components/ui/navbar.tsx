@@ -17,6 +17,7 @@ export default function Navbar() {
     const isAuthenticated = useSelector(
         (state: RootState) => state.auth.isAuthenticated
     );
+    
     return (
         <AppBar position="static">
             <Toolbar sx={{ justifyContent: 'space-between' }}>
