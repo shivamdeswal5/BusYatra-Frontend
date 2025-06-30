@@ -11,6 +11,8 @@ interface Props {
 
 export default function BusDetails({ busId }: Props) {
 
+    console.log("Bus Id is: ",busId);
+
     const dispatch = useDispatch<AppDispatch>()
 
     useEffect(() => {
@@ -38,8 +40,14 @@ export default function BusDetails({ busId }: Props) {
                <Box>
                  Registration Number: {bus.registrationNumber}
                </Box>
-
                
+               <Box>
+                 {
+                    bus.rides
+                 }
+               </Box>
+
+
 
             </Box>
         </>
